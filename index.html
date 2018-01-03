@@ -1,40 +1,105 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-us">
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <link rel="stylesheet" type="text/css" href="assets/css/reset.css">
-  <link rel="stylesheet" type="text/css" href="assets/css/style.css">
+  <title>Hangman</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <!-- <link rel="stylesheet" href="assets/css/reset.css"> -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
     crossorigin="anonymous">
-
-  <title>Document</title>
 </head>
 
 <body>
-  <script src="assets/javascript/game.js"></script>
-  <div id="container">
-    <div id="row">
+  <div class="container">
+    <div class="row"></div>
+    <div class="row">
       <h1>Hangman</h1>
-    </div>
-    <div id="row">
-      <div class="col-md-6">
+      <div class="col-md-3"></div>
+      <div class="col-md-3">
+        <h2>Press any key to get started:</h2>
+        <p id="right"></p>
+        <p>
+          <span id="remain">10</span> guesses remain
+        </p>
+        <p>
+            <span id="wins">0</span> wins
+          </p>
+        <p id="wrong"></p>
       </div>
-      <div class="col-md-6">
-        <form id="hangman">
-          <input type="text" maxlength="1" minlength="1" name="letter" id="letter" placeholder="Guess a letter" />
-          <input id="guess" name="guess" type="submit" value="Guess" />
-          <br>
-          <button id="restart" name="restart" type="button">Restart</button>
-        </form>
-        <ul id="letters"></ul>
-        <p id="man"></p>
-        <p id="output" class="output"></p>
-      </div>
+      <div class="col-md-3"></div>
+      <div class="col-md-3"></div>
     </div>
   </div>
+
+  <style type="text/css">
+    #right {
+      letter-spacing: 3px;
+    }
+  </style>
+
+  <script type="text/javascript">
+    var words = ["cat", "dog", "giraffe", "squirrel", "tiger"];
+
+    var wins = 0; 
+
+    var game = {
+      guessed: [],
+      left: 10,
+      start: function () {
+        this.complete = false;
+        this.word = words[Math.floor(Math.random() * words.length)];
+        this.$right = document.getElementById('right');
+        this.$wrong = document.getElementById('wrong');
+        this.$remain = document.getElementById('remain');
+        this.$wins = document.getElementById('wins');
+
+        this.$right.innerHTML = '_'.repeat(this.word.length);
+      },
+      guess: function (letter) {
+        if (this.left > 0 && this.complete != true) {
+          if (this.word.indexOf(letter) > -1 || this.guessed.indexOf(letter) > -1) {
+            this.right(letter);
+          } else {
+            this.wrong(letter);
+          }
+        }
+      },
+      right: function (letter) {
+        for (var i = 0; i < this.word.length; i++) {
+          if (this.word[i] == letter) {
+            var word = this.$right.innerHTML.split('');
+            word[i] = letter;
+            this.$right.innerHTML = word.join('');
+          }
+        }
+
+        if (this.$right.innerHTML.indexOf('_') < 0) {
+          alert('you win!'); wins ++;
+          this.complete = true;
+        }
+      },
+      wrong: function (letter) {
+        this.guessed.push(letter);
+        this.$wrong.innerHTML += ' ' + letter;
+        this.left--;
+
+        this.$remain.innerHTML = this.left;
+
+        if (this.left < 1) {
+          alert('you lose! ' + this.word);
+          this.complete = true;
+        }
+      }
+    };
+
+    game.start();
+
+    document.onkeyup = function (event) {
+      var letter = String.fromCharCode(event.keyCode).toLowerCase();
+      game.guess(letter);
+    };
+  </script>
 </body>
 
 </html>
